@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Available Courses</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="flex relative">
+        <!-- Mobile Menu Button -->
+        <button id="menuToggle" class="menu-toggle fixed top-4 left-4 z-50 p-2 bg-gray-800 rounded-md text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+        </button>
+        
+        <!-- Overlay for mobile sidebar -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+        
+        <!-- Sidebar -->
+        <aside class="sidebar w-64 bg-gray-800 h-screen p-6 fixed">
+            <h2 class="text-2xl font-bold mb-6">Navigation</h2>
+            <nav class="space-y-4">
+                <a href="index.html" class="block p-2 rounded hover:bg-gray-700 transition">Home</a>
+                <a href="register.html" class="block p-2 rounded hover:bg-gray-700 transition">Register</a>
+                <a href="courses.html" class="block p-2 rounded hover:bg-gray-700 transition">Courses</a>
+                <a href="enrollment.html" class="block p-2 rounded hover:bg-gray-700 transition">Enroll</a>
+                <a href="dashboard.html" class="block p-2 rounded hover:bg-gray-700 transition">Dashboard</a>
+            </nav>
+            <button id="themeToggle" class="mt-4 w-full p-2 bg-blue-600 rounded hover:bg-blue-700 touch-btn">Toggle Theme</button>
+        </aside>
+        
+        <main class="main-content flex-1 md:ml-64 p-4 md:p-8">
+            <h1 class="text-2xl md:text-3xl font-bold mb-6 mt-12 md:mt-0 text-center md:text-left">Available Courses</h1>
+            <div class="flex justify-center md:justify-start mb-4">
+                <button id="addCourseBtn" class="touch-btn bg-gradient-to-r from-green-500 to-teal-600 p-3 rounded-md hover:from-green-600 hover:to-teal-700 transition">Add New Course</button>
+            </div>
+            
+            <!-- Course stats -->
+            <div class="mb-6 bg-gray-800 p-4 rounded-lg shadow-lg">
+                <h3 class="text-lg font-semibold mb-2">Course Statistics</h3>
+                <div class="flex flex-wrap gap-4">
+                    <div class="bg-blue-900 p-3 rounded-md flex-1 min-w-[120px]">
+                        <div class="text-sm text-blue-300">Total Courses</div>
+                        <div id="totalCourses" class="text-2xl font-bold">0</div>
+                    </div>
+                    <div class="bg-purple-900 p-3 rounded-md flex-1 min-w-[120px]">
+                        <div class="text-sm text-purple-300">Total Enrollments</div>
+                        <div id="totalEnrollments" class="text-2xl font-bold">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <input type="text" id="courseSearch" placeholder="Search courses..." class="w-full p-3 bg-gray-700 rounded-md border border-gray-600">
+            </div>
+            
+            <div id="courseList" class="grid gap-6 card-grid sm:grid-cols-2 lg:grid-cols-3"></div>
+            
+            <!-- No courses message -->
+            <div id="noCourseMessage" class="hidden text-center py-10">
+                <div class="text-6xl mb-4">📚</div>
+                <p class="text-xl text-gray-400">No courses available</p>
+                <p class="text-gray-500 mt-2">Click "Add New Course" to get started.</p>
+            </div>
+            
+            <!-- Add Course Modal -->
+            <div id="addCourseModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+                    <h2 class="text-xl mb-4">Add Course</h2>
+                    <form id="addCourseForm">
+                        <div class="mb-4">
+                            <label for="courseName" class="block text-sm font-medium">Course Name</label>
+                            <input type="text" id="courseName" class="mt-1 w-full p-3 bg-gray-700 rounded-md border border-gray-600 touch-btn" required>
+                        </div>
+                        <div class="flex flex-wrap gap-2">
+                            <button type="submit" class="flex-1 touch-btn bg-blue-600 p-3 rounded hover:bg-blue-700">Add</button>
+                            <button type="button" id="closeAddCourseModal" class="flex-1 touch-btn bg-gray-600 p-3 rounded hover:bg-gray-700">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Update course statistics
+            const updateStats = () => {
+                if (system && system.courses) {
+                    document.getElementById('totalCourses').textContent = system.courses.length;
+                    document.getElementById('totalEnrollments').textContent = system.enrollments.length;
+                }
+            };
+            
+            // Set interval to periodically update stats
+            setInterval(updateStats, 1000);
+            
+            // Search functionality
+            const courseSearch = document.getElementById('courseSearch');
+            if (courseSearch) {
+                courseSearch.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    const courses = system.courses;
+                    const filteredCourses = searchTerm ? 
+                        courses.filter(c => c.name.toLowerCase().includes(searchTerm)) : 
+                        courses;
+                    
+                    // Custom render function for filtered results
+                    const courseList = document.getElementById('courseList');
+                    if (courseList) {
+                        courseList.innerHTML = '';
+                        
+                        if (filteredCourses.length === 0) {
+                            document.getElementById('noCourseMessage').classList.remove('hidden');
+                        } else {
+                            document.getElementById('noCourseMessage').classList.add('hidden');
+                            
+                            filteredCourses.forEach(course => {
+                                const div = document.createElement('div');
+                                div.className = 'card bg-gray-800 p-4 rounded-lg shadow-lg';
+                                div.innerHTML = `
+                                    <h3 class="font-semibold text-lg">Course ID: ${course.id}</h3>
+                                    <p class="mb-3">${course.name}</p>
+                                    <div class="flex justify-end">
+                                        <button class="action-btn bg-red-600 hover:bg-red-700 delete-course-btn" data-id="${course.id}">Delete</button>
+                                    </div>
+                                `;
+                                courseList.appendChild(div);
+                                
+                                div.querySelector('.delete-course-btn').addEventListener('click', async (e) => {
+                                    e.preventDefault();
+                                    if (confirm(`Are you sure you want to delete "${course.name}"?`)) {
+                                        try {
+                                            await system.deleteCourse(course.id);
+                                            // Re-filter after deletion
+                                            courseSearch.dispatchEvent(new Event('input'));
+                                            updateStats();
+                                        } catch (error) {
+                                            alert(`Failed to delete course: ${error.message}`);
+                                        }
+                                    }
+                                });
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

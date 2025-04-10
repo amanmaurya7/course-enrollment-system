@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Registration</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="flex relative">
+        <!-- Mobile Menu Button -->
+        <button id="menuToggle" class="menu-toggle fixed top-4 left-4 z-50 p-2 bg-gray-800 rounded-md text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+        </button>
+        
+        <!-- Overlay for mobile sidebar -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+        
+        <!-- Sidebar -->
+        <aside class="sidebar w-64 bg-gray-800 h-screen p-6 fixed">
+            <h2 class="text-2xl font-bold mb-6">Navigation</h2>
+            <nav class="space-y-4">
+                <a href="index.html" class="block p-2 rounded hover:bg-gray-700 transition">Home</a>
+                <a href="register.html" class="block p-2 rounded hover:bg-gray-700 transition">Register</a>
+                <a href="courses.html" class="block p-2 rounded hover:bg-gray-700 transition">Courses</a>
+                <a href="enrollment.html" class="block p-2 rounded hover:bg-gray-700 transition">Enroll</a>
+                <a href="dashboard.html" class="block p-2 rounded hover:bg-gray-700 transition">Dashboard</a>
+            </nav>
+            <button id="themeToggle" class="mt-4 w-full p-2 bg-blue-600 rounded hover:bg-blue-700 touch-btn">Toggle Theme</button>
+        </aside>
+        
+        <main class="main-content flex-1 md:ml-64 p-4 md:p-8">
+            <h1 class="text-2xl md:text-3xl font-bold mb-6 mt-12 md:mt-0 text-center md:text-left">Register a Student</h1>
+            <div class="flex justify-center md:justify-start">
+                <form id="registerForm" class="w-full max-w-md bg-gray-800 p-6 rounded-lg shadow-lg">
+                    <div class="mb-4">
+                        <label for="name" class="block text-sm font-medium">Full Name</label>
+                        <input type="text" id="name" class="mt-1 w-full p-3 bg-gray-700 rounded-md border border-gray-600 touch-btn" required>
+                    </div>
+                    <div class="mb-4">
+                        <label for="studentType" class="block text-sm font-medium">Student Type</label>
+                        <select id="studentType" class="mt-1 w-full p-3 bg-gray-700 rounded-md border border-gray-600 touch-btn" required>
+                            <option value="domestic">Domestic</option>
+                            <option value="international">International</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full touch-btn bg-gradient-to-r from-blue-500 to-purple-600 p-3 rounded-md hover:from-blue-600 hover:to-purple-700 transition">Register</button>
+                </form>
+            </div>
+            
+            <div id="registerModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-sm">
+                    <p id="registerMessage" class="text-lg"></p>
+                    <button id="closeModal" class="mt-4 bg-blue-600 p-3 rounded hover:bg-blue-700 w-full touch-btn">Close</button>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>

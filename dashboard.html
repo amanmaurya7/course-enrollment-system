@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-900 text-white min-h-screen">
+    <div class="flex relative">
+        <!-- Mobile Menu Button -->
+        <button id="menuToggle" class="menu-toggle fixed top-4 left-4 z-50 p-2 bg-gray-800 rounded-md text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+            </svg>
+        </button>
+        
+        <!-- Overlay for mobile sidebar -->
+        <div id="sidebarOverlay" class="sidebar-overlay"></div>
+        
+        <!-- Sidebar -->
+        <aside class="sidebar w-64 bg-gray-800 h-screen p-6 fixed">
+            <h2 class="text-2xl font-bold mb-6">Navigation</h2>
+            <nav class="space-y-4">
+                <a href="index.html" class="block p-2 rounded hover:bg-gray-700 transition">Home</a>
+                <a href="register.html" class="block p-2 rounded hover:bg-gray-700 transition">Register</a>
+                <a href="courses.html" class="block p-2 rounded hover:bg-gray-700 transition">Courses</a>
+                <a href="enrollment.html" class="block p-2 rounded hover:bg-gray-700 transition">Enroll</a>
+                <a href="dashboard.html" class="block p-2 rounded hover:bg-gray-700 transition">Dashboard</a>
+            </nav>
+            <button id="themeToggle" class="mt-4 w-full p-2 bg-blue-600 rounded hover:bg-blue-700 touch-btn">Toggle Theme</button>
+        </aside>
+        
+        <main class="main-content flex-1 md:ml-64 p-4 md:p-8">
+            <h1 class="text-2xl md:text-3xl font-bold mb-6 mt-12 md:mt-0 text-center md:text-left">Admin Dashboard</h1>
+            
+            <!-- Dashboard summary -->
+            <div class="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-8">
+                <div class="bg-gradient-to-r from-blue-600 to-blue-800 p-4 rounded-lg shadow-lg">
+                    <h2 class="text-sm uppercase tracking-wider opacity-80">Total Students</h2>
+                    <p id="studentCount" class="text-3xl font-bold">0</p>
+                </div>
+                <div class="bg-gradient-to-r from-purple-600 to-purple-800 p-4 rounded-lg shadow-lg">
+                    <h2 class="text-sm uppercase tracking-wider opacity-80">Total Courses</h2>
+                    <p id="courseCount" class="text-3xl font-bold">0</p>
+                </div>
+                <div class="bg-gradient-to-r from-green-600 to-green-800 p-4 rounded-lg shadow-lg">
+                    <h2 class="text-sm uppercase tracking-wider opacity-80">Total Enrollments</h2>
+                    <p id="enrollmentCount" class="text-3xl font-bold">0</p>
+                </div>
+                <div class="bg-gradient-to-r from-red-600 to-red-800 p-4 rounded-lg shadow-lg">
+                    <h2 class="text-sm uppercase tracking-wider opacity-80">Avg Enrollments/Student</h2>
+                    <p id="avgEnrollment" class="text-3xl font-bold">0</p>
+                </div>
+            </div>
+            
+            <!-- Search and filters -->
+            <div class="mb-6 flex flex-col md:flex-row gap-4">
+                <div class="md:w-1/2">
+                    <input type="text" id="studentSearch" placeholder="Search students..." class="w-full p-3 bg-gray-700 rounded-md border border-gray-600">
+                </div>
+                <div class="md:w-1/2">
+                    <input type="text" id="courseSearch" placeholder="Search courses..." class="w-full p-3 bg-gray-700 rounded-md border border-gray-600">
+                </div>
+            </div>
+            
+            <section class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl md:text-2xl font-semibold text-center md:text-left">Registered Students</h2>
+                    <button id="addStudentBtn" class="bg-blue-600 hover:bg-blue-700 p-2 rounded-md touch-btn">Add Student</button>
+                </div>
+                <div class="responsive-table overflow-hidden">
+                    <table class="w-full bg-gray-800 rounded-lg shadow-lg">
+                        <thead>
+                            <tr class="bg-gray-700">
+                                <th class="p-3 text-left cursor-pointer" data-sort="name">Name</th>
+                                <th class="p-3 text-left cursor-pointer" data-sort="type">Type</th>
+                                <th class="p-3 text-left cursor-pointer" data-sort="tuition">Tuition</th>
+                                <th class="p-3 text-left">Courses</th>
+                                <th class="p-3 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody"></tbody>
+                    </table>
+                </div>
+                <!-- Loading & Empty states -->
+                <div id="studentTableLoading" class="hidden p-4 text-center">
+                    <p>Loading students...</p>
+                </div>
+                <div id="studentTableEmpty" class="hidden p-4 text-center text-gray-500">
+                    <p>No students found. Please register students first.</p>
+                </div>
+            </section>
+            
+            <section class="mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-xl md:text-2xl font-semibold text-center md:text-left">Courses</h2>
+                    <button id="dashboardAddCourseBtn" class="bg-green-600 hover:bg-green-700 p-2 rounded-md touch-btn">Add Course</button>
+                </div>
+                <div class="responsive-table overflow-hidden">
+                    <table class="w-full bg-gray-800 rounded-lg shadow-lg">
+                        <thead>
+                            <tr class="bg-gray-700">
+                                <th class="p-3 text-left cursor-pointer" data-sort="id">ID</th>
+                                <th class="p-3 text-left cursor-pointer" data-sort="name">Name</th>
+                                <th class="p-3 text-left">Enrollments</th>
+                                <th class="p-3 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="courseTableBody"></tbody>
+                    </table>
+                </div>
+                <!-- Empty state for courses -->
+                <div id="courseTableEmpty" class="hidden p-4 text-center text-gray-500">
+                    <p>No courses found. Please add courses first.</p>
+                </div>
+            </section>
+            
+            <section>
+                <h2 class="text-xl md:text-2xl font-semibold mb-4 text-center md:text-left">Enrollments</h2>
+                <div class="responsive-table overflow-hidden">
+                    <table class="w-full bg-gray-800 rounded-lg shadow-lg">
+                        <thead>
+                            <tr class="bg-gray-700">
+                                <th class="p-3 text-left cursor-pointer" data-sort="student">Student</th>
+                                <th class="p-3 text-left cursor-pointer" data-sort="course">Course</th>
+                                <th class="p-3 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="enrollmentTableBody"></tbody>
+                    </table>
+                </div>
+                <!-- Empty state for enrollments -->
+                <div id="enrollmentTableEmpty" class="hidden p-4 text-center text-gray-500">
+                    <p>No enrollments yet. Please enroll students in courses first.</p>
+                </div>
+            </section>
+            
+            <!-- Edit Student Modal -->
+            <div id="editStudentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-sm">
+                    <h2 class="text-xl mb-4">Edit Student</h2>
+                    <form id="editStudentForm">
+                        <input type="hidden" id="editStudentIndex">
+                        <div class="mb-4">
+                            <label for="editStudentName" class="block text-sm font-medium">Name</label>
+                            <input type="text" id="editStudentName" class="mt-1 w-full p-3 bg-gray-700 rounded-md border border-gray-600 touch-btn" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="editStudentType" class="block text-sm font-medium">Type</label>
+                            <select id="editStudentType" class="mt-1 w-full p-3 bg-gray-700 rounded-md border border-gray-600 touch-btn" required>
+                                <option value="domestic">Domestic</option>
+                                <option value="international">International</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" class="flex-1 bg-blue-600 p-3 rounded hover:bg-blue-700 touch-btn">Save</button>
+                            <button type="button" id="closeEditStudentModal" class="flex-1 bg-gray-600 p-3 rounded hover:bg-gray-700 touch-btn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Add Student Modal (Dashboard) -->
+            <div id="addStudentDashboardModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+                    <h2 class="text-xl mb-4">Add New Student</h2>
+                    <form id="addStudentDashboardForm">
+                        <div class="mb-4">
+                            <label for="dashboardStudentName" class="block text-sm font-medium">Full Name</label>
+                            <input type="text" id="dashboardStudentName" class="mt-1 w-full p-3 bg-gray-700 rounded-md border border-gray-600 touch-btn" required>
+                        </div>
+                        <div class="mb-4">
+                            <label for="dashboardStudentType" class="block text-sm font-medium">Student Type</label>
+                            <select id="dashboardStudentType" class="mt-1 w-full p-3 bg-gray-700 rounded-md border border-gray-600 touch-btn" required>
+                                <option value="domestic">Domestic</option>
+                                <option value="international">International</option>
+                            </select>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" class="flex-1 bg-blue-600 p-3 rounded hover:bg-blue-700 touch-btn">Add Student</button>
+                            <button type="button" id="closeAddStudentDashboardModal" class="flex-1 bg-gray-600 p-3 rounded hover:bg-gray-700 touch-btn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Add Course Modal (Dashboard) -->
+            <div id="addCourseDashboardModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+                    <h2 class="text-xl mb-4">Add New Course</h2>
+                    <form id="addCourseDashboardForm">
+                        <div class="mb-4">
+                            <label for="dashboardCourseName" class="block text-sm font-medium">Course Name</label>
+                            <input type="text" id="dashboardCourseName" class="mt-1 w-full p-3 bg-gray-700 rounded-md border border-gray-600 touch-btn" required>
+                        </div>
+                        <div class="flex gap-2">
+                            <button type="submit" class="flex-1 bg-green-600 p-3 rounded hover:bg-green-700 touch-btn">Add Course</button>
+                            <button type="button" id="closeAddCourseDashboardModal" class="flex-1 bg-gray-600 p-3 rounded hover:bg-gray-700 touch-btn">Cancel</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Confirmation Dialog -->
+            <div id="confirmationDialog" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+                    <h2 class="text-xl mb-4" id="confirmationTitle">Confirmation</h2>
+                    <p id="confirmationMessage" class="mb-6">Are you sure you want to proceed?</p>
+                    <div class="flex gap-2">
+                        <button id="confirmYesBtn" class="flex-1 bg-red-600 p-3 rounded hover:bg-red-700 touch-btn">Yes, proceed</button>
+                        <button id="confirmNoBtn" class="flex-1 bg-gray-600 p-3 rounded hover:bg-gray-700 touch-btn">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Dashboard-specific functionality
+            
+            // Update dashboard stats
+            const updateDashboardStats = () => {
+                if (system) {
+                    document.getElementById('studentCount').textContent = system.students.length;
+                    document.getElementById('courseCount').textContent = system.courses.length;
+                    document.getElementById('enrollmentCount').textContent = system.enrollments.length;
+                    
+                    const avgEnroll = system.students.length > 0 ? 
+                        (system.enrollments.length / system.students.length).toFixed(1) : '0';
+                    document.getElementById('avgEnrollment').textContent = avgEnroll;
+                    
+                    // Update empty state displays
+                    document.getElementById('studentTableEmpty').classList.toggle('hidden', system.students.length > 0);
+                    document.getElementById('courseTableEmpty').classList.toggle('hidden', system.courses.length > 0);
+                    document.getElementById('enrollmentTableEmpty').classList.toggle('hidden', system.enrollments.length > 0);
+                }
+            };
+            
+            // Set interval to update stats periodically
+            setInterval(updateDashboardStats, 1000);
+            
+            // Dashboard-specific search functionality
+            const studentSearch = document.getElementById('studentSearch');
+            const courseSearch = document.getElementById('courseSearch');
+            
+            if (studentSearch) {
+                studentSearch.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    if (system && system.students) {
+                        const filteredStudents = searchTerm ? 
+                            system.students.filter(s => s.name.toLowerCase().includes(searchTerm)) : 
+                            system.students;
+                            
+                        // Use the existing render function with filtered data
+                        if (window.renderStudents) {
+                            window.renderStudents(filteredStudents);
+                        }
+                    }
+                });
+            }
+            
+            if (courseSearch) {
+                courseSearch.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    if (system && system.courses) {
+                        const filteredCourses = searchTerm ? 
+                            system.courses.filter(c => c.name.toLowerCase().includes(searchTerm)) : 
+                            system.courses;
+                            
+                        // Use the existing render function with filtered data
+                        if (window.renderCourses) {
+                            window.renderCourses(filteredCourses);
+                        }
+                    }
+                });
+            }
+            
+            // Add Student from Dashboard
+            const addStudentBtn = document.getElementById('addStudentBtn');
+            const addStudentDashboardModal = document.getElementById('addStudentDashboardModal');
+            const addStudentDashboardForm = document.getElementById('addStudentDashboardForm');
+            const closeAddStudentDashboardModal = document.getElementById('closeAddStudentDashboardModal');
+            
+            if (addStudentBtn && addStudentDashboardModal && addStudentDashboardForm && closeAddStudentDashboardModal) {
+                addStudentBtn.addEventListener('click', () => {
+                    addStudentDashboardModal.classList.remove('hidden');
+                    document.getElementById('dashboardStudentName').focus();
+                });
+                
+                closeAddStudentDashboardModal.addEventListener('click', () => {
+                    addStudentDashboardModal.classList.add('hidden');
+                });
+                
+                addStudentDashboardForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    try {
+                        const name = document.getElementById('dashboardStudentName').value.trim();
+                        if (!name) {
+                            throw new Error('Student name is required');
+                        }
+                        
+                        const type = document.getElementById('dashboardStudentType').value;
+                        const student = type === 'domestic' ? new DomesticStudent(name) : new InternationalStudent(name);
+                        
+                        await system.addStudent(student);
+                        addStudentDashboardModal.classList.add('hidden');
+                        addStudentDashboardForm.reset();
+                        
+                        // Refresh student table
+                        if (window.renderStudents) {
+                            window.renderStudents(system.students);
+                        }
+                        
+                        updateDashboardStats();
+                    } catch (error) {
+                        alert(`Failed to add student: ${error.message}`);
+                    }
+                });
+            }
+            
+            // Add Course from Dashboard
+            const dashboardAddCourseBtn = document.getElementById('dashboardAddCourseBtn');
+            const addCourseDashboardModal = document.getElementById('addCourseDashboardModal');
+            const addCourseDashboardForm = document.getElementById('addCourseDashboardForm');
+            const closeAddCourseDashboardModal = document.getElementById('closeAddCourseDashboardModal');
+            
+            if (dashboardAddCourseBtn && addCourseDashboardModal && addCourseDashboardForm && closeAddCourseDashboardModal) {
+                dashboardAddCourseBtn.addEventListener('click', () => {
+                    addCourseDashboardModal.classList.remove('hidden');
+                    document.getElementById('dashboardCourseName').focus();
+                });
+                
+                closeAddCourseDashboardModal.addEventListener('click', () => {
+                    addCourseDashboardModal.classList.add('hidden');
+                });
+                
+                addCourseDashboardForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    try {
+                        const name = document.getElementById('dashboardCourseName').value.trim();
+                        if (!name) {
+                            throw new Error('Course name is required');
+                        }
+                        
+                        await system.addCourse(name);
+                        addCourseDashboardModal.classList.add('hidden');
+                        addCourseDashboardForm.reset();
+                        
+                        // Refresh course table
+                        if (window.renderCourses) {
+                            window.renderCourses(system.courses);
+                        }
+                        
+                        updateDashboardStats();
+                    } catch (error) {
+                        alert(`Failed to add course: ${error.message}`);
+                    }
+                });
+            }
+            
+            // Better confirmation dialog
+            window.showConfirmation = (title, message, onConfirm) => {
+                const dialog = document.getElementById('confirmationDialog');
+                const titleEl = document.getElementById('confirmationTitle');
+                const messageEl = document.getElementById('confirmationMessage');
+                const yesBtn = document.getElementById('confirmYesBtn');
+                const noBtn = document.getElementById('confirmNoBtn');
+                
+                titleEl.textContent = title;
+                messageEl.textContent = message;
+                
+                dialog.classList.remove('hidden');
+                
+                // Remove existing listeners
+                const newYesBtn = yesBtn.cloneNode(true);
+                const newNoBtn = noBtn.cloneNode(true);
+                yesBtn.parentNode.replaceChild(newYesBtn, yesBtn);
+                noBtn.parentNode.replaceChild(newNoBtn, noBtn);
+                
+                // Add new listeners
+                newYesBtn.addEventListener('click', () => {
+                    dialog.classList.add('hidden');
+                    onConfirm();
+                });
+                
+                newNoBtn.addEventListener('click', () => {
+                    dialog.classList.add('hidden');
+                });
+            };
+            
+            // Initial stats update
+            updateDashboardStats();
+        });
+    </script>
+</body>
+</html>
