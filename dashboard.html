@@ -6,6 +6,56 @@
     <title>Admin Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Mobile-specific responsive styles */
+        @media (max-width: 768px) {
+            .responsive-table table {
+                border: 0;
+            }
+            
+            .responsive-table table thead {
+                display: none;
+            }
+            
+            .responsive-table table tr {
+                margin-bottom: 1rem;
+                display: block;
+                border-bottom: 2px solid #4b5563;
+                background-color: #374151;
+                border-radius: 0.5rem;
+                overflow: hidden;
+            }
+            
+            .responsive-table table td {
+                display: block;
+                text-align: right;
+                padding: 0.75rem 1rem;
+                position: relative;
+            }
+            
+            .responsive-table table td:before {
+                content: attr(data-label);
+                float: left;
+                font-weight: 600;
+                opacity: 0.75;
+            }
+            
+            /* Improve touch target sizes on mobile */
+            .touch-btn {
+                min-height: 44px;
+                min-width: 44px;
+            }
+        }
+        
+        /* Improved modal responsiveness */
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95% !important;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-900 text-white min-h-screen">
     <div class="flex relative">
@@ -57,18 +107,18 @@
             
             <!-- Search and filters -->
             <div class="mb-6 flex flex-col md:flex-row gap-4">
-                <div class="md:w-1/2">
-                    <input type="text" id="studentSearch" placeholder="Search students..." class="w-full p-3 bg-gray-700 rounded-md border border-gray-600">
+                <div class="w-full md:w-1/2">
+                    <input type="text" id="studentSearch" placeholder="Search students..." class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 touch-btn">
                 </div>
-                <div class="md:w-1/2">
-                    <input type="text" id="courseSearch" placeholder="Search courses..." class="w-full p-3 bg-gray-700 rounded-md border border-gray-600">
+                <div class="w-full md:w-1/2">
+                    <input type="text" id="courseSearch" placeholder="Search courses..." class="w-full p-3 bg-gray-700 rounded-md border border-gray-600 touch-btn">
                 </div>
             </div>
             
             <section class="mb-8">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl md:text-2xl font-semibold text-center md:text-left">Registered Students</h2>
-                    <button id="addStudentBtn" class="bg-blue-600 hover:bg-blue-700 p-2 rounded-md touch-btn">Add Student</button>
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-3">
+                    <h2 class="text-xl md:text-2xl font-semibold text-center sm:text-left">Registered Students</h2>
+                    <button id="addStudentBtn" class="w-full sm:w-auto bg-blue-600 hover:bg-blue-700 py-2 px-4 rounded-md touch-btn">Add Student</button>
                 </div>
                 <div class="responsive-table overflow-hidden">
                     <table class="w-full bg-gray-800 rounded-lg shadow-lg">
@@ -84,7 +134,6 @@
                         <tbody id="studentTableBody"></tbody>
                     </table>
                 </div>
-                <!-- Loading & Empty states -->
                 <div id="studentTableLoading" class="hidden p-4 text-center">
                     <p>Loading students...</p>
                 </div>
@@ -94,9 +143,9 @@
             </section>
             
             <section class="mb-8">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-xl md:text-2xl font-semibold text-center md:text-left">Courses</h2>
-                    <button id="dashboardAddCourseBtn" class="bg-green-600 hover:bg-green-700 p-2 rounded-md touch-btn">Add Course</button>
+                <div class="flex flex-col sm:flex-row justify-between items-center mb-4 gap-3">
+                    <h2 class="text-xl md:text-2xl font-semibold text-center sm:text-left">Courses</h2>
+                    <button id="dashboardAddCourseBtn" class="w-full sm:w-auto bg-green-600 hover:bg-green-700 py-2 px-4 rounded-md touch-btn">Add Course</button>
                 </div>
                 <div class="responsive-table overflow-hidden">
                     <table class="w-full bg-gray-800 rounded-lg shadow-lg">
@@ -111,14 +160,13 @@
                         <tbody id="courseTableBody"></tbody>
                     </table>
                 </div>
-                <!-- Empty state for courses -->
                 <div id="courseTableEmpty" class="hidden p-4 text-center text-gray-500">
                     <p>No courses found. Please add courses first.</p>
                 </div>
             </section>
             
             <section>
-                <h2 class="text-xl md:text-2xl font-semibold mb-4 text-center md:text-left">Enrollments</h2>
+                <h2 class="text-xl md:text-2xl font-semibold mb-4 text-center sm:text-left">Enrollments</h2>
                 <div class="responsive-table overflow-hidden">
                     <table class="w-full bg-gray-800 rounded-lg shadow-lg">
                         <thead>
@@ -131,7 +179,6 @@
                         <tbody id="enrollmentTableBody"></tbody>
                     </table>
                 </div>
-                <!-- Empty state for enrollments -->
                 <div id="enrollmentTableEmpty" class="hidden p-4 text-center text-gray-500">
                     <p>No enrollments yet. Please enroll students in courses first.</p>
                 </div>
@@ -139,7 +186,7 @@
             
             <!-- Edit Student Modal -->
             <div id="editStudentModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-sm">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-sm modal-content">
                     <h2 class="text-xl mb-4">Edit Student</h2>
                     <form id="editStudentForm">
                         <input type="hidden" id="editStudentIndex">
@@ -164,7 +211,7 @@
             
             <!-- Add Student Modal (Dashboard) -->
             <div id="addStudentDashboardModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md modal-content">
                     <h2 class="text-xl mb-4">Add New Student</h2>
                     <form id="addStudentDashboardForm">
                         <div class="mb-4">
@@ -188,7 +235,7 @@
             
             <!-- Add Course Modal (Dashboard) -->
             <div id="addCourseDashboardModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md modal-content">
                     <h2 class="text-xl mb-4">Add New Course</h2>
                     <form id="addCourseDashboardForm">
                         <div class="mb-4">
@@ -205,7 +252,7 @@
             
             <!-- Confirmation Dialog -->
             <div id="confirmationDialog" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-                <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md">
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg w-full max-w-md modal-content">
                     <h2 class="text-xl mb-4" id="confirmationTitle">Confirmation</h2>
                     <p id="confirmationMessage" class="mb-6">Are you sure you want to proceed?</p>
                     <div class="flex gap-2">
@@ -390,6 +437,53 @@
                     dialog.classList.add('hidden');
                 });
             };
+            
+            // Add data-label attributes to table cells for mobile responsiveness
+            const updateTableDataLabels = () => {
+                const tables = document.querySelectorAll('.responsive-table table');
+                tables.forEach(table => {
+                    const headerCells = table.querySelectorAll('thead th');
+                    const headerTexts = Array.from(headerCells).map(th => th.textContent.trim());
+                    
+                    const rows = table.querySelectorAll('tbody tr');
+                    rows.forEach(row => {
+                        const cells = row.querySelectorAll('td');
+                        cells.forEach((cell, index) => {
+                            if (index < headerTexts.length) {
+                                cell.setAttribute('data-label', headerTexts[index]);
+                            }
+                        });
+                    });
+                });
+            };
+            
+            // Call this function whenever tables are rendered
+            const originalRenderStudents = window.renderStudents;
+            if (originalRenderStudents) {
+                window.renderStudents = function(students) {
+                    originalRenderStudents(students);
+                    updateTableDataLabels();
+                };
+            }
+            
+            const originalRenderCourses = window.renderCourses;
+            if (originalRenderCourses) {
+                window.renderCourses = function(courses) {
+                    originalRenderCourses(courses);
+                    updateTableDataLabels();
+                };
+            }
+            
+            const originalRenderEnrollments = window.renderEnrollments;
+            if (originalRenderEnrollments) {
+                window.renderEnrollments = function(enrollments) {
+                    originalRenderEnrollments(enrollments);
+                    updateTableDataLabels();
+                };
+            }
+            
+            // Initial table setup
+            setTimeout(updateTableDataLabels, 500);
             
             // Initial stats update
             updateDashboardStats();
